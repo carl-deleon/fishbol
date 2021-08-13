@@ -79,6 +79,7 @@ platform :android do
       update_type: "major"
     )
 	display_version
+	gitlab
   end
   
   lane :update_minor do
@@ -103,6 +104,7 @@ platform :android do
       update_type: "minor"
     )
 	display_version
+	gitlab
   end
   
   lane :update_patch do
@@ -122,15 +124,20 @@ platform :android do
       update_type: "patch"
     )
 	display_version
+	gitlab(
+	  version: @new_version
+	)
   end
   
-  lane :gitlab do
+  lane :gitlab do |values|
+    @ver = values[:version]
     create_merge_request(
-    api_token: @access_token,
-    project_id: "28846533",                 # Gitlab Project ID
-    title: "Bump version",
-	source: "dev",
-	target: "master"
+      api_token: @access_token,
+      project_id: "28846533",
+      title: "Bump version to v#{@ver}",
+	  source: "dev",
+	  target: "master"
+    )
   end
   
   lane :display_version do
