@@ -125,7 +125,12 @@ platform :android do
   end
   
   lane :gitlab do
-    puts @access_token
+    create_merge_request(
+    api_token: @access_token,
+    project_id: "28846533",                 # Gitlab Project ID
+    title: "Bump version",
+	source: "dev",
+	target: "master"
   end
   
   lane :display_version do
