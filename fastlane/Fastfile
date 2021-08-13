@@ -35,4 +35,91 @@ platform :android do
     gradle(task: "clean assembleRelease")
     upload_to_play_store
   end
+  
+  desc "Experimental"
+  lane :poc do
+    @message = number_of_commits
+	@version_name = get_properties_value(
+	  key: "VERSION_NAME",
+	  path: "./version.properties"
+	)
+	@new_version = increment_version_name_in_properties_file(
+      key: "VERSION_NAME",
+      path: "./version.properties",
+      update_type: "minor"
+    )
+  end
+  
+  lane :update_major do
+    @major_version = get_properties_value(
+	  key: "MAJOR",
+	  path: "./version.properties"
+	)
+	@major_version = @major_version.to_i + 1
+	set_properties_value(
+      path: "./version.properties",
+      key: "MAJOR",
+      value: @major_version
+    )
+	set_properties_value(
+      path: "./version.properties",
+      key: "MINOR",
+      value: 0
+    )
+	set_properties_value(
+      path: "./version.properties",
+      key: "PATCH",
+      value: 0
+    )
+	@new_version = increment_version_name_in_properties_file(
+      key: "VERSION_NAME",
+      path: "./version.properties",
+      update_type: "major"
+    )
+  end
+  
+  lane :update_minor do
+    @minor_version = get_properties_value(
+	  key: "MINOR",
+	  path: "./version.properties"
+	)
+	@minor_version = @minor_version.to_i + 1
+	set_properties_value(
+      path: "./version.properties",
+      key: "MINOR",
+      value: @minor_version
+    )
+	set_properties_value(
+      path: "./version.properties",
+      key: "PATCH",
+      value: 0
+    )
+	@new_version = increment_version_name_in_properties_file(
+      key: "VERSION_NAME",
+      path: "./version.properties",
+      update_type: "minor"
+    )
+  end
+  
+  lane :update_patch do
+    @patch_version = get_properties_value(
+	  key: "PATCH",
+	  path: "./version.properties"
+	)
+	@patch_version = @patch_version.to_i + 1
+	set_properties_value(
+      path: "./version.properties",
+      key: "PATCH",
+      value: @patch_version
+    )
+	@new_version = increment_version_name_in_properties_file(
+      key: "VERSION_NAME",
+      path: "./version.properties",
+      update_type: "patch"
+    )
+  end
+  
+  after_all do |lane, options|
+    puts "Updated to new version! v#{@new_version}"
+  end
 end
