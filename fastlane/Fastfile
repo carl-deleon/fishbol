@@ -121,5 +121,6 @@ platform :android do
   
   after_all do |lane, options|
     puts "Updated to new version! v#{@new_version}"
+	git_commit(path: "./version.properties", message: "BUMP version to v#{@new_version}")
   end
 end
