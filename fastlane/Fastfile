@@ -15,6 +15,8 @@
 
 default_platform(:android)
 
+@access_token = ENV['GITLAB_ACCESS_TOKEN']
+
 platform :android do
   desc "Runs all the tests"
   lane :test do
@@ -76,6 +78,7 @@ platform :android do
       path: "./version.properties",
       update_type: "major"
     )
+	display_version
   end
   
   lane :update_minor do
@@ -99,6 +102,7 @@ platform :android do
       path: "./version.properties",
       update_type: "minor"
     )
+	display_version
   end
   
   lane :update_patch do
@@ -117,9 +121,14 @@ platform :android do
       path: "./version.properties",
       update_type: "patch"
     )
+	display_version
   end
   
-  after_all do |lane, options|
+  lane :gitlab do
+    puts @access_token
+  end
+  
+  lane :display_version do
     puts "Updated to new version! v#{@new_version}"
 	git_commit(path: "./version.properties", message: "BUMP version to v#{@new_version}")
   end

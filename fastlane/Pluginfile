@@ -3,3 +3,4 @@
 # Ensure this file is checked in to source control!
 
 gem 'fastlane-plugin-properties'
+gem 'fastlane-plugin-create_merge_request'
