@@ -52,7 +52,8 @@ platform :android do
     )
   end
   
-  lane :update_major do
+  lane :update_major do |values|
+    @env = values[:env]
     @major_version = get_properties_value(
 	  key: "MAJOR",
 	  path: "./version.properties"
@@ -78,11 +79,20 @@ platform :android do
       path: "./version.properties",
       update_type: "major"
     )
-	display_version
-	gitlab
+	@new_branch = "#{@env}/#{@new_version}"
+	sh "git checkout -b #{@new_branch}"
+	display_version(
+	  env: @env
+	)
+	gitlab(
+	  version: @new_version,
+	  branch: @new_branch,
+	  env: @env
+	)
   end
   
-  lane :update_minor do
+  lane :update_minor do |values|
+    @env = values[:env]
     @minor_version = get_properties_value(
 	  key: "MINOR",
 	  path: "./version.properties"
@@ -103,11 +113,20 @@ platform :android do
       path: "./version.properties",
       update_type: "minor"
     )
-	display_version
-	gitlab
+	@new_branch = "#{@env}/#{@new_version}"
+	sh "git checkout -b #{@new_branch}"
+	display_version(
+	  env: @env
+	)
+	gitlab(
+	  version: @new_version,
+	  branch: @new_branch,
+	  env: @env
+	)
   end
   
-  lane :update_patch do
+  lane :update_patch do |values|
+    @env = values[:env]
     @patch_version = get_properties_value(
 	  key: "PATCH",
 	  path: "./version.properties"
@@ -123,25 +142,35 @@ platform :android do
       path: "./version.properties",
       update_type: "patch"
     )
-	display_version
+	@new_branch = "#{@env}/#{@new_version}"
+	sh "git checkout -b #{@new_branch}"
+	display_version(
+	  env: @env
+	)
 	gitlab(
-	  version: @new_version
+	  version: @new_version,
+	  branch: @new_branch,
+	  env: @env
 	)
   end
   
   lane :gitlab do |values|
     @ver = values[:version]
+	@env = values[:env]
+	@source_branch = values[:branch]
     create_merge_request(
       api_token: @access_token,
       project_id: "28846533",
-      title: "Bump version to v#{@ver}",
-	  source: "dev",
+      title: "Bump #{@env} version to v#{@ver}",
+	  source: "#{@source_branch}",
 	  target: "master"
     )
   end
   
-  lane :display_version do
+  lane :display_version do |values|
+    @env = values[:env]
     puts "Updated to new version! v#{@new_version}"
-	git_commit(path: "./version.properties", message: "BUMP version to v#{@new_version}")
+	git_commit(path: "./version.properties", message: "BUMP #{@env} version to v#{@new_version}")
+	push_to_git_remote
   end
 end
