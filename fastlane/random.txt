@@ -1,1 +1,2 @@
 Added this line for changelog.md
+Another line was added for changelog entry fixed.
